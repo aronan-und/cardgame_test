@@ -325,44 +325,10 @@ public class EnemyTurnState : StateMachineBase<EnemyTurnState>
 
             if (defenceCard != null)
             {
-                /*
-                machine.gameManager.StartCoroutine(attackCard.movement.AttackMotion(defenceCard.transform,()=>
-                {
-                    //machine.gameManager.CardBattle(machine.attackCard, defenceCard);//移動を始める前にバトルが終わる（エネミー側が死ぬ時、バグる）
-                    if(attackCard.model.hp > 0)
-                    {
-                        attackCard.On_E_CardMove2.AddListener(E_CardMove);
-                    }
-                    else
-                    {
-                        machine.ChangeState(new EnemyTurnState.AttackIdel(machine));
-                    }
-                }));
-                */
-                /*
-                Vector3 cardPosition = machine.attackCard.transform.position;
-                Transform cardTransform = machine.attackCard.transform.parent;
-                machine.attackCard.transform.SetParent(cardTransform.parent);
-                machine.gameManager.StartCoroutine(machine.attackCard.movement.AttackMotion2(defenceCard.transform.position));
-                machine.gameManager.CardBattle(machine.attackCard, defenceCard);
-                if(machine.attackCard != null)
-                {
-                    machine.gameManager.StartCoroutine(machine.attackCard.movement.AttackMotion2(cardPosition));
-                    machine.attackCard.transform.SetParent(cardTransform);
-                }
-                */
-                //machine.attackCard.On_E_CardMove.AddListener(E_CardMove);
                 machine.ChangeState(new EnemyTurnState.CardBattle(machine, attackCard, defenceCard, c_Position, c_Parent));
             }
             else
             {
-                /*
-                machine.gameManager.StartCoroutine(attackCard.movement.AttackMotion(machine.playerLeaderTransform,()=> {
-                    //machine.gameManager.AttackToLeader(machine.attackCard, false);
-                    attackCard.On_E_CardMove2.AddListener(E_CardMoveLeader);
-                }));
-                */
-                //machine.attackCard.OnBattle.AddListener(E_CardMoveEnd);
                 machine.ChangeState(new EnemyTurnState.CardBattleLeader(machine, attackCard, c_Position, c_Parent));
             }
         }
@@ -375,13 +341,6 @@ public class EnemyTurnState : StateMachineBase<EnemyTurnState>
                 machine.ChangeState(new EnemyTurnState.AttackIdel(machine));
             }
         }
-        
-        /*
-        public override void OnExitState()
-        {
-            machine.attackCard.On_E_CardMove.RemoveListener(E_CardMove);
-        }
-        */
     }
 
     private class CardBattle : StateBase<EnemyTurnState>
@@ -413,11 +372,6 @@ public class EnemyTurnState : StateMachineBase<EnemyTurnState>
                     machine.ChangeState(new EnemyTurnState.AttackIdel(machine));
                 }
             }));
-
-            //else
-            //{
-            //machine.ChangeState(new EnemyTurnState.AttackIdel(machine));
-            //}
         }
     }
 
@@ -438,11 +392,8 @@ public class EnemyTurnState : StateMachineBase<EnemyTurnState>
                 machine.ChangeState(new EnemyTurnState.AttackIdel(machine));
             });
             machine.gameManager.StartCoroutine(atkCard.movement.AttackMotion(machine.playerLeaderTransform, () => {
-                //machine.gameManager.AttackToLeader(machine.attackCard, false);
                 machine.gameManager.AttackToLeader(atkCard, false);
             }));
-            //machine.gameManager.StartCoroutine(machine.attackCard.movement.AttackMotion2(c_Position, c_Parent));
-            //machine.ChangeState(new EnemyTurnState.AttackIdel(machine));
         }
     }
 
