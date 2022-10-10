@@ -95,7 +95,7 @@ public class CardController : MonoBehaviour
     public void DestroyCard(CardController card)
     {
         Destroy(card.gameObject);
-        Debug.Log(card.gameObject.name);
+        //Debug.Log(card.gameObject.name);
         if(myField != null)
         {
             myField.removeCard(card);

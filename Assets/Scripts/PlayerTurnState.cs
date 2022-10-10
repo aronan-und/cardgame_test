@@ -45,13 +45,6 @@ public class PlayerTurnState : StateMachineBase<PlayerTurnState>
     {
         p_ManaPoint += cost;
         ShowManaPoint();
-        /*
-        CardController[] playerHandCardList = p_Hand.GetComponentsInChildren<CardController>();
-        foreach (CardController card in playerHandCardList)
-        {
-            card.HandCanDrag(p_ManaPoint);
-        }
-        */
     }
     public void CardRefresh(bool isPanel) //場のカードにパネルを付けるor消す
     {

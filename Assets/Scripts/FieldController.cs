@@ -173,23 +173,6 @@ public class FieldController : MonoBehaviour
         }
     }
 
-    /*
-    public bool FieldCardCanAttack(out List<CardController>canAttackList)
-    {
-        canAttackList = null;
-        for (int i = 0; i < cardControllerArr.Length; i++)
-        {
-            int x = i % 3;
-            int y = i / 3;
-            if (cardControllerArr[x, y] != null)
-            {
-                canAttackList.Add();
-            }
-        }
-        return false;
-    }
-    */
-
     public void RefreshWall()
     {
         LeaderWall.SetActive(IsWall());

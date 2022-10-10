@@ -23,6 +23,4 @@ MonoBehaviour:
   targetType: 2
   syugo: 0
   sokkou: 0
-  draw1: 0
-  draw2: 1
-  draw3: 0
+  drawCount: 2

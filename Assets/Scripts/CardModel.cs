@@ -17,9 +17,7 @@ public class CardModel
     public int targetType;
     public bool syugo;
     public bool sokkou;
-    public bool draw1;
-    public bool draw2;
-    public bool draw3;
+    public int drawCount;
 
     public bool PlayerCard = false;
     public bool canAttack = false;
@@ -41,9 +39,7 @@ public class CardModel
         targetType = cardEntity.targetType;
         syugo = cardEntity.syugo;
         sokkou = cardEntity.sokkou;
-        draw1 = cardEntity.draw1;
-        draw2 = cardEntity.draw2;
-        draw3 = cardEntity.draw3;
+        drawCount = cardEntity.drawCount;
 
         PlayerCard = playerCard;
     }

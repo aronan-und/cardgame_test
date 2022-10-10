@@ -17,7 +17,5 @@ public class CardEntity : ScriptableObject
     public int targetType;
     public bool syugo;
     public bool sokkou;
-    public bool draw1;
-    public bool draw2;
-    public bool draw3;
+    public int drawCount;
 }

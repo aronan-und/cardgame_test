@@ -111,7 +111,6 @@ public class CardMovement : MonoBehaviour, IDragHandler, IBeginDragHandler, IEnd
                 FieldCardMoveCacel.Invoke();
             }
         }
-
         transform.SetParent(cardParent, false);
         GetComponent<CanvasGroup>().blocksRaycasts = true; // blocksRaycastsをオンにする
 

@@ -20,8 +20,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] Text playerDefaultManaPointText;
     [SerializeField] Text enemyManaPointText;
     [SerializeField] Text enemyDefaultManaPointText;
-    [SerializeField] Transform playerLeaderTransform;
-    [SerializeField] Transform enemyLeaderTransform;
     [SerializeField] Text playerDeckText, enemyDeckText;
     [SerializeField] GameObject playerDeckImage, enemyDeckImage;
     [SerializeField] FieldController enemyFieldController;
@@ -191,28 +189,22 @@ public class GameManager : MonoBehaviour
     }
     public void MagicCard(CardController card)
     {
+        //Debug.Log("マジックカード発動");
         //ドロー用
-        if (card.model.draw1)
+        if (card.model.drawCount > 0)
         {
-            EnemyDrawCard(enemyHand);
-        }
-        if (card.model.draw2)
-        {
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < card.model.drawCount; i++)
             {
                 StartCoroutine(DelayMethod(0.5f * i, () =>
                 {
-                    EnemyDrawCard(enemyHand);
-                }));
-            }
-        }
-        if (card.model.draw3)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                StartCoroutine(DelayMethod(0.5f * i, () =>
-                {
-                    EnemyDrawCard(enemyHand);
+                    if (card.model.PlayerCard)
+                    {
+                        PlayerDrawCard(playerHand);
+                    }
+                    else
+                    {
+                        EnemyDrawCard(enemyHand);
+                    }
                 }));
             }
         }
@@ -362,38 +354,6 @@ public class GameManager : MonoBehaviour
             playerTurnState.TurnEnd();
             ChangeTurn();
         });
-
-        /*
-        //Debug.Log("Playerのターン");
-        turnChangeTrigger = true;
-
-        CardController playerCenterFrontCard = playerCenterFront.GetComponentInChildren<CardController>();
-        CardController playerRightFrontCard = playerRightFront.GetComponentInChildren<CardController>();
-        CardController playerLeftFrontCard = playerLeftFront.GetComponentInChildren<CardController>();
-        CardController playerCenterBackCard = playerCenterBack.GetComponentInChildren<CardController>();
-        CardController playerRightBackCard = playerRightBack.GetComponentInChildren<CardController>();
-        CardController playerLeftBackCard = playerLeftBack.GetComponentInChildren<CardController>();
-        SetAttackableFieldCard(playerCenterFrontCard, true);
-        SetAttackableFieldCard(playerRightFrontCard, true);
-        SetAttackableFieldCard(playerLeftFrontCard, true);
-        SetAttackableFieldCard(playerCenterBackCard, true);
-        SetAttackableFieldCard(playerRightBackCard, true);
-        SetAttackableFieldCard(playerLeftBackCard, true);
-        
-        /// マナを増やす
-        if (playerDefaultManaPoint < 10)
-        {
-            playerDefaultManaPoint++;
-        }
-        else
-        {
-            playerDefaultManaPoint = 10;
-        }
-        playerManaPoint = playerDefaultManaPoint;
-        ShowManaPoint();
-
-        PlayerDrawCard(playerHand); // 手札を一枚加える
-        */
     }
 
     private void PlayerTurnEnd()
@@ -441,8 +401,6 @@ public class GameManager : MonoBehaviour
 
     IEnumerator EnemyTurn()
     {
-        //Debug.Log("Enemyのターン");
-        
         /// マナを増やす
         if (enemyDefaultManaPoint < 10)
         {
@@ -457,222 +415,6 @@ public class GameManager : MonoBehaviour
             enemyTurnState.TurnEnd();
             ChangeTurn();
         });
-        /*
-        enemyManaPoint = enemyDefaultManaPoint;
-        EnemyShowManaPoint();
-
-        yield return new WaitForSeconds(1f);
-
-        EnemyDrawCard(enemyHand);
-        
-
-        CardController enemyCenterFrontCard = enemyCenterFront.GetComponentInChildren<CardController>();
-        CardController enemyRightFrontCard = enemyRightFront.GetComponentInChildren<CardController>();
-        CardController enemyLeftFrontCard = enemyLeftFront.GetComponentInChildren<CardController>();
-        CardController enemyCenterBackCard = enemyCenterBack.GetComponentInChildren<CardController>();
-        CardController enemyRightBackCard = enemyRightBack.GetComponentInChildren<CardController>();
-        CardController enemyLeftBackCard = enemyLeftBack.GetComponentInChildren<CardController>();
-        SetAttackableFieldCard(enemyCenterFrontCard, true);
-        SetAttackableFieldCard(enemyRightFrontCard, true);
-        SetAttackableFieldCard(enemyLeftFrontCard, true);
-        SetAttackableFieldCard(enemyCenterBackCard, true);
-        SetAttackableFieldCard(enemyRightBackCard, true);
-        SetAttackableFieldCard(enemyLeftBackCard, true);
-
-        CardController[] enemyHandCardArr = enemyHand.GetComponentsInChildren<CardController>();
-        int cardCount = enemyHandCardArr.Length;
-
-        ////手札の最低コストカード>マナ　になるまで繰り返す
-        for (int j = 0; j < cardCount; j++)
-        {
-            yield return new WaitForSeconds(1f);
-            ///カードを一枚召喚
-            //残マナ以下　かつ　手札の最大マナカードを指定
-            enemyHandCardArr = enemyHand.GetComponentsInChildren<CardController>();
-            int manaChecker = -1;
-            CardController nextCard = null;
-            for (int i = 0; i < enemyHandCardArr.Length; i++)
-            {
-                if (enemyHandCardArr[i].model.cost > manaChecker &&
-                    enemyManaPoint >= enemyHandCardArr[i].model.cost)
-                {
-                    manaChecker = enemyHandCardArr[i].model.cost;
-                }
-            }
-            for (int i = 0; i < enemyHandCardArr.Length; i++)
-            {
-                if (enemyHandCardArr[i].model.cost == manaChecker)
-                {
-                    nextCard = enemyHandCardArr[i];
-                    break;
-                }
-            }
-
-            //手札から場に召喚、マナ減らし
-            if (nextCard != null)
-            {
-                int nextEnemyCardID = nextCard.model.cardID;
-                int nextEnemyCardMana = nextCard.model.cost;
-      
-                if(!enemyFieldController.EnemyGetRandomEmpty(out Vector2Int emptyPoint))
-                {
-                    if (nextCard.model.magic)//マジックカードの時
-                    {
-                        emptyPoint = new Vector2Int(0,0);//仮
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                Transform[,] enemyCardPlaceArr = new Transform[3, 2]
-                {
-                    {enemyLeftFront,enemyLeftBack},
-                    {enemyCenterFront,enemyCenterBack},
-                    {enemyRightFront,enemyRightBack}
-                };
-                Debug.Log(emptyPoint);
-                Transform targetPlace = enemyCardPlaceArr[emptyPoint.x, emptyPoint.y];
-                CreateCardEnemy(nextEnemyCardID, targetPlace);
-                enemyManaPoint -= nextEnemyCardMana;
-                CardController createdCard = targetPlace.GetComponentInChildren<CardController>();
-                enemyFieldController.SetCard(emptyPoint, createdCard);
-                createdCard.model.FieldCard = true;
-
-                DropPlace.instance.DropFieldCard(nextCard);  //DropPlace経由でFieldControllerのSetCard()へ
-
-                EnemyShowManaPoint();
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        yield return new WaitForSeconds(1f);
-
-        ///攻撃AI
-        
-
-        CardController enemyCenterFrontCardSecond = enemyCenterFront.GetComponentInChildren<CardController>();
-        CardController enemyRightFrontCardSecond = enemyRightFront.GetComponentInChildren<CardController>();
-        CardController enemyLeftFrontCardSecond = enemyLeftFront.GetComponentInChildren<CardController>();
-        CardController enemyCenterBackCardSecond = enemyCenterBack.GetComponentInChildren<CardController>();
-        CardController enemyRightBackCardSecond = enemyRightBack.GetComponentInChildren<CardController>();
-        CardController enemyLeftBackCardSecond = enemyLeftBack.GetComponentInChildren<CardController>();
-        CardController playerCenterFrontCard = playerCenterFront.GetComponentInChildren<CardController>();
-        CardController playerRightFrontCard = playerRightFront.GetComponentInChildren<CardController>();
-        CardController playerLeftFrontCard = playerLeftFront.GetComponentInChildren<CardController>();
-        CardController playerCenterBackCard = playerCenterBack.GetComponentInChildren<CardController>();
-        CardController playerRightBackCard = playerRightBack.GetComponentInChildren<CardController>();
-        CardController playerLeftBackCard = playerLeftBack.GetComponentInChildren<CardController>();
-
-        if (enemyCenterFrontCardSecond != null && enemyCenterFrontCardSecond.model.canAttack)
-        {
-            CardController attackCard = enemyCenterFrontCardSecond;
-            CardController defenceCard = playerCenterFrontCard;
-            if (playerCenterFrontCard != null)
-            {
-                yield return StartCoroutine(attackCard.movement.AttackMotion(defenceCard.transform));
-                CardBattle(attackCard, defenceCard);
-            }
-            else
-            {
-                yield return StartCoroutine(attackCard.movement.AttackMotion(playerLeaderTransform));
-                AttackToLeader(attackCard, false);
-            }
-            yield return new WaitForSeconds(1f);
-            enemyCenterFrontCard = enemyCenterFront.GetComponentInChildren<CardController>();
-        }
-        if (enemyRightFrontCardSecond != null && enemyRightFrontCardSecond.model.canAttack)
-        {
-            CardController attackCard = enemyRightFrontCardSecond;
-            CardController defenceCard = playerRightFrontCard;
-            if (playerRightFrontCard != null)
-            {
-                yield return StartCoroutine(attackCard.movement.AttackMotion(defenceCard.transform));
-                CardBattle(attackCard, defenceCard);
-            }
-            else
-            {
-                yield return StartCoroutine(attackCard.movement.AttackMotion(playerLeaderTransform));
-                AttackToLeader(attackCard, false);
-            }
-            yield return new WaitForSeconds(1f);
-            enemyRightFrontCard = enemyRightFront.GetComponentInChildren<CardController>();
-        }
-        if (enemyLeftFrontCardSecond != null && enemyLeftFrontCardSecond.model.canAttack)
-        {
-            CardController attackCard = enemyLeftFrontCardSecond;
-            CardController defenceCard = playerLeftFrontCard;
-            if (playerLeftFrontCard != null)
-            {
-                yield return StartCoroutine(attackCard.movement.AttackMotion(defenceCard.transform));
-                CardBattle(attackCard, defenceCard);
-            }
-            else
-            {
-                yield return StartCoroutine(attackCard.movement.AttackMotion(playerLeaderTransform));
-                AttackToLeader(attackCard, false);
-            }
-            yield return new WaitForSeconds(1f);
-            enemyLeftFrontCard = enemyLeftFront.GetComponentInChildren<CardController>();
-        }
-        if (enemyCenterBackCardSecond != null && enemyCenterBackCardSecond.model.canAttack)
-        {
-            CardController attackCard = enemyCenterBackCardSecond;
-            CardController defenceCard = playerCenterBackCard;
-            if (playerCenterBackCard != null)
-            {
-                yield return StartCoroutine(attackCard.movement.AttackMotion(defenceCard.transform));
-                CardBattle(attackCard, defenceCard);
-            }
-            else
-            {
-                yield return StartCoroutine(attackCard.movement.AttackMotion(playerLeaderTransform));
-                AttackToLeader(attackCard, false);
-            }
-            yield return new WaitForSeconds(1f);
-            enemyCenterBackCard = enemyCenterBack.GetComponentInChildren<CardController>();
-        }
-        if (enemyRightBackCardSecond != null && enemyRightBackCardSecond.model.canAttack)
-        {
-            CardController attackCard = enemyRightBackCardSecond;
-            CardController defenceCard = playerRightBackCard;
-            if (playerRightBackCard != null)
-            {
-                yield return StartCoroutine(attackCard.movement.AttackMotion(defenceCard.transform));
-                CardBattle(attackCard, defenceCard);
-            }
-            else
-            {
-                yield return StartCoroutine(attackCard.movement.AttackMotion(playerLeaderTransform));
-                AttackToLeader(attackCard, false);
-            }
-            yield return new WaitForSeconds(1f);
-            enemyRightBackCard = enemyRightBack.GetComponentInChildren<CardController>();
-        }
-        if (enemyLeftBackCardSecond != null && enemyLeftBackCardSecond.model.canAttack)
-        {
-            CardController attackCard = enemyLeftBackCardSecond;
-            CardController defenceCard = playerLeftBackCard;
-            if (playerLeftBackCard != null)
-            {
-                yield return StartCoroutine(attackCard.movement.AttackMotion(defenceCard.transform));
-                CardBattle(attackCard, defenceCard);
-            }
-            else
-            {
-                yield return StartCoroutine(attackCard.movement.AttackMotion(playerLeaderTransform));
-                AttackToLeader(attackCard, false);
-            }
-            yield return new WaitForSeconds(1f);
-            enemyLeftBackCard = enemyLeftBack.GetComponentInChildren<CardController>();
-        }
-        ChangeTurn(); // ターンエンドする
-                
-        */
     }
 
     public bool CheckCardBattle(CardController attackCard, CardController defenceCard)
